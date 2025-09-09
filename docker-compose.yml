@@ -1,0 +1,145 @@
+# version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - fleet-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "29092:29092"
+    networks:
+      - fleet-network
+
+  postgres:
+    image: timescale/timescaledb:2.11.2-pg14
+    environment:
+      POSTGRES_DB: fleet
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/initdb:/docker-entrypoint-initdb.d
+    networks:
+      - fleet-network
+
+  minio:
+    image: minio/minio:RELEASE.2023-09-04T19-57-37Z
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - fleet-network
+
+  mlflow:
+    image: mlflow-custom  # Use the custom image
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://postgres:postgres@postgres:5432/fleet
+      --default-artifact-root s3://mlflow-artifacts/
+      --host 0.0.0.0
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - fleet-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_URL=postgresql://postgres:postgres@postgres:5432/fleet
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin 
+      - AWS_REGION=us-east-1
+      - MLFLOW_S3_USE_PATH_STYLE=true
+      - MLFLOW_BUCKET_NAME=mlflow-artifacts
+    volumes:
+      - .:/app
+      - /app/.venv
+      - ./mlflow-artifacts:/app/mlflow-artifacts  # Local fallback
+    ports:
+      - "8000:8000"
+      - "8050:8050"
+    depends_on:
+      - kafka
+      - postgres
+      - minio
+      - mlflow
+    networks:
+      - fleet-network
+    command: >
+      bash -c "python scripts/wait_for_services.py &&
+               python scripts/cleanup_minio.py &&
+               python scripts/init_minio.py &&
+               python scripts/seed_demo_data.py &&
+               python scripts/ensure_model_exists.py &&
+               faust -A src.data.stream_processor worker &&
+               python src/api/app.py"
+               
+  grafana:
+    image: grafana/grafana:10.0.3
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/docker/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - postgres
+    networks:
+      - fleet-network
+
+volumes:
+  postgres_data:
+  minio_data:
+    driver: local
+    driver_opts:
+      type: tmpfs  # Use tmpfs for better performance (volatile)
+      device: tmpfs
+      o: size=2G  # Increase size to 2GB
+  grafana_data:
+
+networks:
+  fleet-network:
+    driver: bridge

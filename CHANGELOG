@@ -1,0 +1,55 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] - 2025-01-08
+### Added
+- Initial release of fleet management system
+- Route optimization using machine learning models
+- Real-time vehicle tracking and telemetry
+- Driver behavior analysis and scoring system
+- Predictive maintenance forecasting using historical data
+- REST API endpoints for fleet data access
+- Authentication and authorization system
+- Dashboard for fleet performance metrics
+
+### Fixed
+- Memory leak in the telemetry data collection service
+- Edge case handling in route optimization algorithm
+- Time zone conversion issues in reporting module
+
+### Changed
+- Upgraded TensorFlow dependencies to version 2.15
+- Improved ML model architecture for better prediction accuracy
+- Enhanced data preprocessing pipeline
+- Optimized database queries for better performance
+
+### Security
+- Implemented rate limiting for API endpoints
+- Added input validation for all user-submitted data
+- Enhanced encryption for sensitive vehicle data
+
+## [0.9.0] - 2024-12-15
+### Added
+- Beta release of core functionality
+- Basic route planning capabilities
+- Vehicle status monitoring
+- Simple reporting features
+
+### Changed
+- Refactored database schema for better scalability
+- Updated UI components for improved user experience
+
+### Deprecated
+- Legacy CSV export format (will be removed in 1.1.0)
+
+## [0.8.0] - 2024-11-30
+### Added
+- Alpha testing release
+- Proof of concept ML models
+- Basic API structure
+
+[1.0.0]: https://github.com/username/fleet-management/compare/v0.9.0...v1.0.0
+[0.9.0]: https://github.com/username/fleet-management/compare/v0.8.0...v0.9.0
+[0.8.0]: https://github.com/username/fleet-management/releases/tag/v0.8.0
