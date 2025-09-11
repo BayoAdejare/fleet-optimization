@@ -159,7 +159,7 @@ Our fleet optimization solution relies on various open data sources and APIs:
 5. **Fuel Pricing Data**:
    - API: Fuel API (open alternative)
    - Usage: Fuel pricing for cost optimization
-   - Documentation: [Fuel API](https://fuel-api.com/)
+   - Documentation: [Fuel Prices API](https://developer.tomtom.com/fuel-prices-api/documentation/tomtom-maps/fuel-prices-api/fuel-price)
 
 To use these data sources:
 
