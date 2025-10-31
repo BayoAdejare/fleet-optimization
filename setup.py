@@ -26,7 +26,7 @@ setuptools.setup(
         "psycopg2-binary>=2.9.9", # PostgreSQL adapter
         "timescaledb>=0.0.4",     # Time-series extension
         "sqlalchemy==2.0.29",     # Explicitly set to compatible version
-        "jsonschema==4.18.0",      # Explicitly pinned to compatible version
+        "jsonschema==4.18.0",     # Explicitly pinned to compatible version
 
         # Machine Learning
         "scikit-learn>=1.4.2",
@@ -98,16 +98,16 @@ setuptools.setup(
         "Intended Audience :: Transportation",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
         "Operating System :: OS Independent"
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.11",
     include_package_data=True,
     package_data={
         "config": ["*.yaml"],
