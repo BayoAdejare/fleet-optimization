@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://hub.docker.com/r/bayoadejare/fleet-optimization)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-Native-326ce5.svg)](https://kubernetes.io/)
-[![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
+[![Python Version](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![MLflow](https://img.shields.io/badge/MLflow-Integrated-0194E2.svg)](https://mlflow.org/)
 
 **TL;DR: A production-ready open-source platform for predictive maintenance and route optimization that reduces fleet operational costs by up to 25%.**
@@ -21,7 +21,7 @@ cd fleet-optimization
 # 2. Copy environment template
 cp .env.example .env
 
-# 3. Start all services (Kafka, MinIO, PostgreSQL, MLflow, Dash)
+# 3. Start all services on docker/podman (Kafka, MinIO, PostgreSQL, MLflow, Dash)
 docker compose up -d
 
 # 4. Generate sample data and train initial models
@@ -66,15 +66,22 @@ docker compose exec app python scripts/seed_demo_data.py
 This project leverages open-source technologies including Python, MLflow, Prefect, PostgreSQL, and Kubernetes to optimize fleet operations. Our solution provides valuable insights for logistics companies, transportation services, and any business managing a fleet of vehicles while maintaining vendor neutrality and cost efficiency.
 
 ## Table of Contents
-- [Project Overview](#project-overview)
-- [Architecture](#architecture)
-- [Data Sources and APIs](#data-sources-and-apis)
-- [Project Structure](#project-structure)
-- [Setup and Installation](#setup-and-installation)
-- [Usage](#usage)
-- [Use Cases](#use-cases)
-- [Examples](#examples)
-- [License](#license)
+- [Fleet Optimization Solution](#fleet-optimization-solution)
+  - [🚀 Quick Start (5 Steps, 10 Minutes)](#-quick-start-5-steps-10-minutes)
+  - [Feature Comparison: Open Source vs. Proprietary Solutions](#feature-comparison-open-source-vs-proprietary-solutions)
+  - [Table of Contents](#table-of-contents)
+  - [Project Overview](#project-overview)
+  - [Architecture](#architecture)
+  - [Data Sources and APIs](#data-sources-and-apis)
+  - [Project Structure](#project-structure)
+  - [Setup and Installation](#setup-and-installation)
+  - [Usage](#usage)
+  - [Use Cases](#use-cases)
+  - [Examples](#examples)
+    - [Predictive Maintenance API](#predictive-maintenance-api)
+    - [Route Optimization](#route-optimization)
+    - [MLflow Tracking](#mlflow-tracking)
+  - [License](#license)
 
 ## Project Overview
 
