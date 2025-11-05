@@ -35,11 +35,11 @@ services:
     ports:
       - "9092:9092"
     healthcheck:
-      test: ["CMD", "bash", "-c", "nc -z localhost 9092 || nc -z localhost 29092"]
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
       interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 40s
+      timeout: 10s
+      retries: 6
+      start_period: 75s
     volumes:
       - ./scripts/kafka_topics.sh:/usr/local/bin/kafka_topics.sh
     networks:
@@ -86,7 +86,9 @@ services:
       - fleet-network
 
   mlflow:
-    image: mlflow-custom
+    build: 
+      context: .
+      dockerfile: infrastructure/docker/mlflow/Dockerfile
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
@@ -95,11 +97,11 @@ services:
     ports:
       - "5000:5000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/2.0/mlflow/experiments/search?max_results=1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     command: >
       mlflow server
       --backend-store-uri postgresql://postgres:postgres@postgres:5432/fleet
@@ -179,13 +181,13 @@ services:
 
 volumes:
   postgres_data:
+    # Simple named volume - compatible with both Docker and Podman
   minio_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-      o: size=2G
+    # Simple named volume - removed problematic driver_opts
+    # For development, this uses default storage
+    # For production, consider external volume with proper storage management
   grafana_data:
+    # Simple named volume - compatible with both
 
 networks:
   fleet-network:
